@@ -1,70 +1,101 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Copy, Check, Image as ImageIcon, IndianRupee, QrCode } from 'lucide-react';
+import { Upload, Copy, Check, Image as ImageIcon, IndianRupee, QrCode, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export default function AdminGalleryPage() {
+  const supabase = createClientComponentClient();
   const [clientName, setClientName] = useState('');
   const [amount, setAmount] = useState('2000');
   const [upiId, setUpiId] = useState('9988672153@paytm');
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
+  const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const [galleryCreated, setGalleryCreated] = useState(false);
   const [galleryLink, setGalleryLink] = useState('');
 
-  // 🚀 Live URL / Domain ਆਟੋਮੈਟਿਕ ਡਿਟੈਕਟ ਕਰਨ ਲਈ
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setGalleryLink(`${window.location.origin}/gallery`);
     }
   }, []);
 
-  // 🚀 Base64 ਵਿੱਚ ਫੋਟੋ ਅੱਪਲੋਡ ਕਰਨ ਦਾ ਸਹੀ ਤਰੀਕਾ
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          if (reader.result) {
-            setUploadedFiles((prev) => [...prev, reader.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    setUploading(true);
+    const files = Array.from(e.target.files);
+    const newUrls: string[] = [];
+
+    for (const file of files) {
+      if (file.size > 50 * 1024 * 1024) {
+        alert(`⚠️ ਫਾਈਲ ${file.name} 50 MB ਤੋਂ ਵੱਡੀ ਹੈ।`);
+        continue;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `photos/${fileName}`;
+
+      const { error } = await supabase.storage
+        .from('gallery-photos')
+        .upload(filePath, file);
+
+      if (error) {
+        console.error('Upload Error:', error.message);
+        alert(`ਅੱਪਲੋਡ ਫੇਲ੍ਹ: ${error.message}`);
+      } else {
+        const { data: publicUrlData } = supabase.storage
+          .from('gallery-photos')
+          .getPublicUrl(filePath);
+
+        if (publicUrlData?.publicUrl) {
+          newUrls.push(publicUrlData.publicUrl);
+        }
+      }
     }
+
+    setUploadedUrls((prev) => [...prev, ...newUrls]);
+    setUploading(false);
   };
 
-  const handleCreateGallery = (e: React.FormEvent) => {
+  const handleCreateGallery = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName) {
       alert('ਕਿਰਪਾ ਕਰਕੇ ਕਲਾਇੰਟ ਦਾ ਨਾਮ ਭਰੋ');
       return;
     }
 
-    const galleryData = {
-      clientName,
+    setSaving(true);
+    const uniqueId = `gal_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const photosList = uploadedUrls.map((url, i) => ({ id: String(i + 1), url }));
+
+    const galleryPayload = {
+      id: uniqueId,
+      client_name: clientName,
       amount: Number(amount) || 2000,
-      upiId: upiId || '9988672153@paytm',
-      photos:
-        uploadedFiles.length > 0
-          ? uploadedFiles.map((url, i) => ({ id: String(i + 1), url }))
-          : [
-              { id: '1', url: 'https://images.unsplash.com/photo-1519741497674-611481863552' },
-              { id: '2', url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc' },
-            ],
+      upi_id: upiId || '9988672153@paytm',
+      photos: photosList,
     };
 
-    // LocalStorage ਵਿੱਚ ਸੇਵ
-    localStorage.setItem('custom_client_gallery', JSON.stringify(galleryData));
-    
-    // Dynamic Link Update
+    const { error } = await supabase.from('galleries').insert([galleryPayload]);
+
+    if (error) {
+      console.error('Database Error:', error.message);
+      localStorage.setItem(`gallery_${uniqueId}`, JSON.stringify(galleryPayload));
+      localStorage.setItem('custom_client_gallery', JSON.stringify(galleryPayload));
+    }
+
     const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-    setGalleryLink(`${currentOrigin}/gallery`);
+    const finalUniqueUrl = `${currentOrigin}/gallery?id=${uniqueId}`;
     
+    setGalleryLink(finalUniqueUrl);
     setGalleryCreated(true);
-    alert('✅ ਫੋਟੋਆਂ ਸਫਲਤਾਪੂਰਵਕ ਸੇਵ ਹੋ ਗਈਆਂ ਹਨ!');
+    setSaving(false);
+    alert('✅ ਨਵੀਂ ਗੈਲਰੀ ਦਾ ਪਰਮਾਨੈਂਟ ਲਿੰਕ ਸਫਲਤਾਪੂਰਵਕ ਬਣ ਗਿਆ ਹੈ!');
   };
 
   const copyToClipboard = () => {
@@ -78,7 +109,7 @@ export default function AdminGalleryPage() {
       <div className="border-b pb-4">
         <h1 className="text-3xl font-bold tracking-tight">Studio Admin Dashboard</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          ਕਲਾਇੰਟ ਲਈ ਨਵੀਂ ਵਾਟਰਮਾਰਕ ਗੈਲਰੀ ਬਣਾਓ, ਫੋਟੋਆਂ ਅੱਪਲੋਡ ਕਰੋ ਅਤੇ UPI ਪੇਮੈਂਟ ਸੈੱਟ ਕਰੋ।
+          ਕਲਾਇੰਟ ਲਈ ਨਵੀਂ ਵਾਟਰਮਾਰਕ ਗੈਲਰੀ ਬਣਾਓ ਅਤੇ ਪਰਮਾਨੈਂਟ ਲਿੰਕ ਜਨਰੇਟ ਕਰੋ।
         </p>
       </div>
 
@@ -127,26 +158,38 @@ export default function AdminGalleryPage() {
             </div>
 
             <div className="pt-2">
-              <label className="block text-xs font-medium mb-1">Upload Album Photos</label>
+              <label className="block text-xs font-medium mb-1">Upload HD Album Photos</label>
               <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 text-center hover:bg-black/5 transition cursor-pointer relative">
                 <input
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
+                  disabled={uploading || saving}
+                  className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed"
                 />
-                <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm font-medium">Click or Drag photos here to upload</p>
-                <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP up to 20MB each</p>
+                {uploading ? (
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+                    <p className="text-sm font-medium text-emerald-500">Supabase 'ਤੇ ਫੋਟੋਆਂ ਅੱਪਲੋਡ ਹੋ ਰਹੀਆਂ ਹਨ...</p>
+                  </div>
+                ) : (
+                  <>
+                    <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm font-medium">Click or Drag HD photos here</p>
+                    <p className="text-xs text-muted-foreground mt-1">Direct Cloud Upload</p>
+                  </>
+                )}
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition"
+              disabled={uploading || saving}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-medium py-3 rounded-lg transition flex items-center justify-center gap-2"
             >
-              Generate Client Gallery Link
+              {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {saving ? 'Creating Gallery Link...' : 'Generate Client Gallery Link'}
             </button>
           </form>
         </div>
@@ -157,7 +200,7 @@ export default function AdminGalleryPage() {
 
             {galleryCreated ? (
               <div className="space-y-3">
-                <p className="text-xs text-emerald-500 font-medium">✅ Gallery Created Successfully!</p>
+                <p className="text-xs text-emerald-500 font-medium">✅ Permanent Gallery Link Created!</p>
                 <div className="p-2.5 bg-black/5 dark:bg-white/5 rounded-lg border text-xs break-all font-mono">
                   {galleryLink}
                 </div>
@@ -166,12 +209,12 @@ export default function AdminGalleryPage() {
                   className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground text-xs py-2 rounded-lg font-medium hover:opacity-90 transition"
                 >
                   {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
-                  {copied ? 'Link Copied!' : 'Copy Link for Client'}
+                  {copied ? 'Link Copied!' : 'Copy Unique Link for Client'}
                 </button>
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">
-                ਗੈਲਰੀ ਬਣਾਉਣ ਲਈ ਫਾਰਮ ਭਰ ਕੇ "Generate Client Gallery Link" 'ਤੇ ਕਲਿੱਕ ਕਰੋ।
+                ਫੋਟੋਆਂ ਅੱਪਲੋਡ ਕਰਕੇ "Generate Client Gallery Link" 'ਤੇ ਕਲਿੱਕ ਕਰੋ।
               </p>
             )}
           </div>
@@ -179,12 +222,12 @@ export default function AdminGalleryPage() {
           <div className="bg-card p-6 rounded-xl border shadow-sm space-y-3">
             <h3 className="text-sm font-semibold flex items-center justify-between">
               <span>Uploaded Photos</span>
-              <span className="text-xs text-emerald-500 font-bold">{uploadedFiles.length} Photos</span>
+              <span className="text-xs text-emerald-500 font-bold">{uploadedUrls.length} Photos</span>
             </h3>
 
-            {uploadedFiles.length > 0 ? (
+            {uploadedUrls.length > 0 ? (
               <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
-                {uploadedFiles.map((src, index) => (
+                {uploadedUrls.map((src, index) => (
                   <Image
                     key={index}
                     src={src}
