@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Upload, Copy, Check, Image as ImageIcon, IndianRupee, QrCode } from 'lucide-react';
 import Image from 'next/image';
 
@@ -11,6 +11,14 @@ export default function AdminGalleryPage() {
   const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [galleryCreated, setGalleryCreated] = useState(false);
+  const [galleryLink, setGalleryLink] = useState('');
+
+  // 🚀 Live URL / Domain ਆਟੋਮੈਟਿਕ ਡਿਟੈਕਟ ਕਰਨ ਲਈ
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setGalleryLink(`${window.location.origin}/gallery`);
+    }
+  }, []);
 
   // 🚀 Base64 ਵਿੱਚ ਫੋਟੋ ਅੱਪਲੋਡ ਕਰਨ ਦਾ ਸਹੀ ਤਰੀਕਾ
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,11 +58,14 @@ export default function AdminGalleryPage() {
 
     // LocalStorage ਵਿੱਚ ਸੇਵ
     localStorage.setItem('custom_client_gallery', JSON.stringify(galleryData));
+    
+    // Dynamic Link Update
+    const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+    setGalleryLink(`${currentOrigin}/gallery`);
+    
     setGalleryCreated(true);
     alert('✅ ਫੋਟੋਆਂ ਸਫਲਤਾਪੂਰਵਕ ਸੇਵ ਹੋ ਗਈਆਂ ਹਨ!');
   };
-
-  const galleryLink = `http://localhost:3000/gallery`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(galleryLink);
