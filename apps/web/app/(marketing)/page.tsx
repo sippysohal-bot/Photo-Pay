@@ -1,4 +1,7 @@
+'use client';
+
 export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { Camera, Image as ImageIcon, ArrowRight, Sparkles, Lock, Zap, ShieldCheck } from 'lucide-react';
 
@@ -107,9 +110,9 @@ export default function MarketingPage() {
         </div>
       </main>
 
-      {/* FOOTER WITH 40% OPACITY SOHAL DEVELOPER BRANDING */}
+      {/* FOOTER */}
       <footer className="container mx-auto border-t border-slate-800/60 py-6 px-6 text-center text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-2">
-        <span>© {new Date().getFullYear()} Photo Pay. All Rights Reserved.</span>
+        <span>© 2026 Photo Pay. All Rights Reserved.</span>
         <span className="opacity-40 font-semibold tracking-wider text-slate-300">
           Designed & Developed by Sohal Developer
         </span>
