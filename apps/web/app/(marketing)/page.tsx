@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import Link from 'next/link';
 import { Camera, Image as ImageIcon, ArrowRight, Sparkles, Lock, Zap, ShieldCheck } from 'lucide-react';
 
