@@ -59,16 +59,20 @@ const AppConfigSchema = z
     },
   );
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : 'https://photo-pay-web.vercel.app';
+
 const appConfig = AppConfigSchema.parse({
-  name: process.env.NEXT_PUBLIC_PRODUCT_NAME,
-  title: process.env.NEXT_PUBLIC_SITE_TITLE,
-  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION,
-  url: process.env.NEXT_PUBLIC_SITE_URL,
-  locale: process.env.NEXT_PUBLIC_DEFAULT_LOCALE,
-  theme: process.env.NEXT_PUBLIC_DEFAULT_THEME_MODE,
-  themeColor: process.env.NEXT_PUBLIC_THEME_COLOR,
-  themeColorDark: process.env.NEXT_PUBLIC_THEME_COLOR_DARK,
+  url: siteUrl,
+  name: process.env.NEXT_PUBLIC_PRODUCT_NAME || 'Photo Pay',
+  title: process.env.NEXT_PUBLIC_SITE_TITLE || 'Photo Pay',
+  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION || 'Photo Pay App',
+  locale: process.env.NEXT_PUBLIC_DEFAULT_LOCALE || 'en',
+  theme: (process.env.NEXT_PUBLIC_DEFAULT_THEME_MODE as any) || 'system',
   production,
+  themeColor: process.env.NEXT_PUBLIC_THEME_COLOR || '#ffffff',
+  themeColorDark: process.env.NEXT_PUBLIC_THEME_COLOR_DARK || '#000000',
 });
 
 export default appConfig;
