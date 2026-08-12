@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils';
+import Year from '../year-client';
 
 interface FooterSection {
   heading: React.ReactNode;
@@ -42,9 +43,9 @@ export const Footer: React.FC<FooterProps> = ({
                   <p className="text-muted-foreground text-sm">{description}</p>
                 </div>
 
-                <div className="text-muted-foreground flex text-xs">
-                 <p>© Copyright {new Date().getFullYear()} Studio Management System. All Rights Reserved.</p>
-              </div>              
+                 <div className="text-muted-foreground flex text-xs">
+                  <p>© Copyright <Year /> Studio Management System. All Rights Reserved.</p>
+                </div>
             </div>
             </div>
           </div>
