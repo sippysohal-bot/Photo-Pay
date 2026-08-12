@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Upload, Copy, Check, Image as ImageIcon, IndianRupee, QrCode } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AdminGalleryPage() {
   const [clientName, setClientName] = useState('');
@@ -173,11 +174,14 @@ export default function AdminGalleryPage() {
             {uploadedFiles.length > 0 ? (
               <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
                 {uploadedFiles.map((src, index) => (
-                  <img
+                  <Image
                     key={index}
                     src={src}
                     alt="Uploaded"
-                    className="w-full h-16 object-cover rounded-md border"
+                    width={160}
+                    height={96}
+                    className="object-cover rounded-md border"
+                    unoptimized
                   />
                 ))}
               </div>

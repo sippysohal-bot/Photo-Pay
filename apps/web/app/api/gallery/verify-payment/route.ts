@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    const { galleryId, transactionId } = await request.json();
+    const { galleryId, transactionId: _transactionId } = await request.json();
 
     if (!galleryId) {
       return NextResponse.json(
@@ -17,6 +17,9 @@ export async function POST(request: Request) {
       isPaid: true,
     });
   } catch (error) {
+    // Log the error for debugging purposes and return a generic server error
+    // eslint-disable-next-line no-console
+    console.error('verify-payment error:', error);
     return NextResponse.json(
       { success: false, message: 'Server error' },
       { status: 500 }

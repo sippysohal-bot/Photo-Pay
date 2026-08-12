@@ -1,3 +1,4 @@
+
 import { getMessages } from 'next-intl/server';
 
 import { routing } from '@kit/i18n/routing';

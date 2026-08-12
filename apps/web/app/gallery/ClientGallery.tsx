@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Download, Lock, QrCode, CheckCircle2 } from 'lucide-react';
 import AdBanner from '~/components/gallery/AdBanner';
 
@@ -46,6 +47,9 @@ export default function ClientGallery({
         alert('Payment verification failed.');
       }
     } catch (err) {
+      // Log the error for debugging
+      // eslint-disable-next-line no-console
+      console.error('verify payment failed', err);
       alert('Failed to verify payment. Please try again.');
     } finally {
       setLoading(false);
@@ -93,10 +97,12 @@ export default function ClientGallery({
             className="relative group overflow-hidden rounded-xl border bg-black/5 aspect-[4/3]"
           >
             {/* PHOTO */}
-            <img
+            <Image
               src={photo.url}
               alt="Shoot Photo"
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
 
             {/* WATERMARK OVERLAY */}
@@ -140,8 +146,8 @@ export default function ClientGallery({
             </p>
 
             {/* QR CODE DISPLAY */}
-            <div className="flex justify-center p-3 bg-white rounded-xl border inline-block mx-auto">
-              <img src={upiQrUrl} alt="UPI QR Code" className="w-52 h-52" />
+              <div className="flex justify-center p-3 bg-white rounded-xl border inline-block mx-auto">
+              <Image src={upiQrUrl} alt="UPI QR Code" width={208} height={208} unoptimized />
             </div>
 
             <div className="text-sm font-semibold text-emerald-600">

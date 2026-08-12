@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({
   className,
   logo,
   description,
-  copyright,
+  copyright: _copyright,
   sections,
   ...props
 }) => {

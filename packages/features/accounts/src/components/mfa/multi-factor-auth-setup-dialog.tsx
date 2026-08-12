@@ -426,13 +426,9 @@ function FactorNameForm(
 
 function QrImage({ src }: { src: string }) {
   return (
-    <img
-      alt={'QR Code'}
-      src={src}
-      width={160}
-      height={160}
-      className={'bg-white p-2'}
-    />
+    // QR code is a simple data URL; allow raw <img> here
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt={'QR Code'} src={src} width={160} height={160} className={'bg-white p-2'} />
   );
 }
 

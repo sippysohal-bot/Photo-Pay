@@ -1,17 +1,20 @@
+'use client';
+
 import Link from 'next/link';
 import { Camera, Image as ImageIcon, ArrowRight, Sparkles, Lock, Zap, ShieldCheck } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white font-sans">
+    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col justify-between font-sans">
+      
       {/* NAVBAR */}
       <header className="container mx-auto flex justify-between items-center py-5 px-6 border-b border-slate-800/80">
         <div className="flex items-center gap-3 font-extrabold text-xl tracking-tight">
           <div className="p-2 rounded-xl bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20">
             <Camera className="w-5 h-5" />
           </div>
-          <span className="text-white font-bold text-lg">
-            Narinder Sohal Studio
+          <span className="text-white font-bold text-xl tracking-wide">
+            Photo Pay
           </span>
         </div>
 
@@ -31,19 +34,20 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* MAIN HERO SECTION */}
-      <main className="container mx-auto my-auto py-12 px-6 text-center space-y-8 max-w-4xl">
-        {/* TOP BADGE */}
+      {/* HERO SECTION */}
+      <main className="container mx-auto my-auto py-10 px-6 text-center space-y-6 max-w-5xl">
+        
+        {/* BADGE */}
         <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-medium">
           <Sparkles className="w-3.5 h-3.5" /> Premium Client Photo Proofing Portal
         </div>
 
-        {/* HERO HEADING */}
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.1]">
-          Professional Photo Delivery &{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">
-            Proofing Portal
-          </span>
+        {/* HEADING */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight max-w-4xl mx-auto">
+          <div>Professional Photo Delivery</div>
+          <div className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+            & Proofing Portal
+          </div>
         </h1>
 
         {/* SUBTITLE */}
@@ -52,7 +56,7 @@ export default function HomePage() {
         </p>
 
         {/* ACTION BUTTONS */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <Link
             href="/gallery"
             className="w-full sm:w-auto flex items-center justify-center gap-2.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-8 py-3.5 rounded-xl transition shadow-xl shadow-emerald-500/20 active:scale-95"
@@ -71,7 +75,7 @@ export default function HomePage() {
         </div>
 
         {/* FEATURES GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-12 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 text-left">
           <div className="bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl space-y-2">
             <div className="p-2 w-fit rounded-lg bg-emerald-500/10 text-emerald-400">
               <Lock className="w-4 h-4" />
@@ -106,7 +110,7 @@ export default function HomePage() {
 
       {/* FOOTER */}
       <footer className="container mx-auto border-t border-slate-800/60 py-6 px-6 text-center text-xs text-slate-500">
-        © {new Date().getFullYear()} Narinder Sohal 9988672153. All Rights Reserved.
+        © 2026 Narinder Sohal 9988672153. All Rights Reserved.
       </footer>
     </div>
   );

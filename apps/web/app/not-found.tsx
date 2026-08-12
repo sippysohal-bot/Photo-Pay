@@ -1,7 +1,8 @@
+
 import Link from 'next/link';
 
 import { ArrowLeft } from 'lucide-react';
-import { getTranslations } from 'next-intl/server';
+// getTranslations is not needed here
 
 import { Button } from '@kit/ui/button';
 import { Heading } from '@kit/ui/heading';
@@ -9,15 +10,9 @@ import { Trans } from '@kit/ui/trans';
 
 import { SiteHeader } from '~/(marketing)/_components/site-header';
 
-export const generateMetadata = async () => {
-  const t = await getTranslations();
-  const title = t('common.notFound');
-
-  return {
-    title,
-  };
+export const metadata = {
+  title: 'Page Not Found',
 };
-
 const NotFoundPage = () => {
   return (
     <div className={'flex h-screen flex-1 flex-col'}>
